@@ -1,0 +1,32 @@
+name: Generate IP Range Files
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:   # امکان اجرای دستی
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run IP generator script
+        run: python generate_ip_files.py
+
+      - name: Commit and push generated files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ip_lists/
+          git diff --staged --quiet || (
+            git commit -m "Auto-generate IP range files [skip ci]"
+            git push
+          )
